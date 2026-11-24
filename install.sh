@@ -8,7 +8,12 @@ RULES="$REPO/rules/workflow.md"
 
 link() {
   mkdir -p "$(dirname "$2")"
-  if [ -e "$2" ] && [ ! -L "$2" ]; then
+  if [ -L "$2" ]; then
+    case "$(readlink "$2")" in
+      "$REPO"/*) ;;
+      *) echo "skip  $2 (links to $(readlink "$2"); remove it and re-run)"; return ;;
+    esac
+  elif [ -e "$2" ]; then
     echo "skip  $2 (real file in the way; move it and re-run)"
     return
   fi
